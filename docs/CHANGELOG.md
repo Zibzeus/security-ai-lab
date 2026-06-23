@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-06-23 - Security Agent container build
+
+- Copied the Python `app` package before running `pip install .` in the image.
+- Added a CI Docker build to catch container-only packaging failures.
+
+## 2026-06-23 - 8 GB AI VM profile
+
+- Made Compose CPU and memory limits configurable through `.env`.
+- Set the default profile to Qwen3-4B Q4_K_M with context 2048, batch 64,
+  three llama.cpp threads, and a 5.5 GB model-container limit.
+
+## 2026-06-23 - Dynamic MCP and BAS discovery
+
+- Added MCP wildcard mode while retaining server-side authentication.
+- Added `mcp_list_tools` for runtime MCP discovery.
+- Added `bas.list_capabilities` for BAS capability discovery.
+- Kept arbitrary BAS binaries behind approved, scoped, sandboxed
+  `shell.execute`.
+
 ## 2026-06-23 - CI secret-scan false positive
 
 - Replaced literal CALDERA test credentials with generated unit-test-only values.
