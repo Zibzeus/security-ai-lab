@@ -45,6 +45,12 @@ def certipy_find(
 CAPABILITIES = {
     item.name: item
     for item in [
+        Capability(
+            "bas.list_capabilities",
+            "read_only",
+            30,
+            api_action="list_capabilities",
+        ),
         Capability("nxc.smb_discover", "active_scan", 300, nxc("smb")),
         Capability("nxc.ldap_discover", "active_scan", 300, nxc("ldap")),
         Capability("certipy.find", "authenticated_enumeration", 600, certipy_find),
