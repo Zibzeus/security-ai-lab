@@ -63,7 +63,15 @@ class SecurityAgent:
             {"profile": request.profile.value, "objective": request.objective},
         )
 
-        plan = await self._plan(request, knowledge, selected_skills)
+        plan = (
+            await self._plan(request, knowledge, selected_skills)
+            if request.allow_tools
+            else Plan(
+                summary="Tool execution disabled by request.",
+                hypotheses=[],
+                tool_requests=[],
+            )
+        )
         results = await self._execute_tools(case_id, request, plan)
         report = await self._report(request, plan, knowledge, results)
 
@@ -108,7 +116,7 @@ class SecurityAgent:
                 {"role": "system", "content": SYSTEM_PROMPTS[request.profile.value]},
                 {"role": "user", "content": json.dumps(prompt, ensure_ascii=True)},
             ],
-            max_tokens=900,
+            max_tokens=self.llm.settings.llm_plan_max_tokens,
         )
         try:
             return Plan.model_validate(self.llm.parse_json(content))
@@ -217,5 +225,5 @@ class SecurityAgent:
                 {"role": "system", "content": SYSTEM_PROMPTS[request.profile.value]},
                 {"role": "user", "content": json.dumps(payload, ensure_ascii=True)},
             ],
-            max_tokens=1400,
+            max_tokens=self.llm.settings.llm_report_max_tokens,
         )
