@@ -5,8 +5,8 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 COPY pyproject.toml .
-RUN pip install --no-cache-dir .
 COPY app app
+RUN pip install --no-cache-dir .
 COPY policies policies
 COPY knowledge knowledge
 COPY skills skills
