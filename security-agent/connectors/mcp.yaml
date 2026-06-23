@@ -3,17 +3,9 @@ servers:
     url: http://extrahop-mcp:8322/mcp
     bearer_token_env: EXTRAHOP_MCP_TOKEN
     allowed_tools:
-      - get_detections
-      - get_detection
-      - search_records
-      - get_device
-      - get_metrics
+      - "*"
   crowdstrike:
     url: http://crowdstrike-mcp:8080/mcp
     bearer_token_env: CROWDSTRIKE_MCP_TOKEN
     allowed_tools:
-      - search_detections
-      - get_detection
-      - search_hosts
-      - get_host
-      - search_events
+      - "*"
