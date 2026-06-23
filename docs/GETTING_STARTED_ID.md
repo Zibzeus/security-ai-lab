@@ -22,7 +22,7 @@ BAS VM: policy enforcement + CALDERA/BloodHound/tools + artifacts
 Engagement allowlist targets
 ```
 
-Spesifikasi AI VM:
+Spesifikasi target AI VM:
 
 ```text
 Ubuntu Server 24.04 LTS
@@ -31,6 +31,10 @@ Ubuntu Server 24.04 LTS
 100 GB storage
 Tanpa GPU
 ```
+
+Profil minimum yang sudah disiapkan di Compose adalah 4 vCPU, 8 GB RAM, swap
+4 GB, context 2048, batch 64, tiga thread llama.cpp, dan satu parallel slot.
+Jangan menjalankan platform BAS berat pada AI VM minimum ini.
 
 BAS VM harus terpisah dan memiliki tools security yang dibutuhkan.
 
@@ -181,22 +185,50 @@ cp .env.example .env
 openssl rand -hex 32
 openssl rand -hex 32
 openssl rand -hex 32
+openssl rand -hex 32
 ```
 
-Gunakan tiga hasil berbeda:
+Gunakan empat hasil berbeda:
 
 ```dotenv
 API_KEY=<random-pertama>
 APPROVAL_KEY=<random-kedua>
 BAS_EXECUTOR_SECRET=<random-ketiga>
+WEB_SESSION_SECRET=<random-keempat>
+WEB_USERNAME=admin
 
 LLM_BASE_URL=http://llama:8080/v1
 LLM_MODEL=local-model
-LLM_CONTEXT_SIZE=4096
-LLM_BATCH_SIZE=128
+LLM_CONTEXT_SIZE=2048
+LLM_BATCH_SIZE=64
+LLM_DISABLE_THINKING=true
+LLM_PLAN_MAX_TOKENS=350
+LLM_REPORT_MAX_TOKENS=650
+LLAMA_THREADS=3
+LLAMA_MEMORY_LIMIT=5500m
+LLAMA_CPUS=3
+AGENT_MEMORY_LIMIT=768m
+AGENT_CPUS=1
 
 LAB_CIDRS=10.100.31.0/24,10.10.0.0/16
 BAS_EXECUTOR_URL=http://<BAS_PRIVATE_IP>:8010
+```
+
+Build image Agent lalu buat password hash Web UI:
+
+```bash
+docker compose build agent
+docker compose run --rm --no-deps \
+  --entrypoint python agent \
+  /app/scripts/hash_web_password.py
+```
+
+Tambahkan output `scrypt$...` ke `.env`:
+
+```dotenv
+WEB_PASSWORD_HASH='scrypt$...'
+WEB_SECURE_COOKIE=true
+ENABLE_API_DOCS=false
 ```
 
 Gunakan permission ketat:
@@ -205,7 +237,9 @@ Gunakan permission ketat:
 chmod 600 .env
 ```
 
-`APPROVAL_KEY` hanya diberikan kepada approver/operator yang berwenang.
+`APPROVAL_KEY` hanya diberikan kepada approver/operator yang berwenang. Password
+Web UI tidak menggantikan approval key; eksekusi yang memerlukan approval tetap
+meminta credential tersebut.
 
 ## 8. Konfigurasi MCP
 
@@ -215,13 +249,26 @@ Edit:
 nano connectors/mcp.yaml
 ```
 
-Sesuaikan URL, token environment, dan nama tool dengan MCP server yang
-benar-benar aktif. Jangan mengasumsikan nama tool dari dokumentasi lama.
+Sesuaikan URL dengan MCP server yang benar-benar aktif. Untuk topology lab ini:
 
-Mulai dari read-only:
+```yaml
+servers:
+  extrahop:
+    url: https://10.100.31.4:8325/mcp
+    ca_cert: /app/local-certs/extrahop-mcp.crt
+    allowed_tools:
+      - "*"
+  crowdstrike:
+    url: http://10.100.31.4:8000/mcp
+    allowed_tools:
+      - "*"
+```
 
-- ExtraHop detection, device, record, dan metric query.
-- CrowdStrike detection, host, dan event query.
+Wildcard membuat `mcp_list_tools` dan `mcp_query` dapat memakai seluruh tool
+yang diekspos server tersebut, tanpa daftar nama statis. Ini bukan bypass
+otorisasi: permission akun/API token dan policy pada MCP server tetap berlaku.
+Untuk server yang juga memiliki tool write/destructive, gunakan credential
+read-only atau ganti wildcard dengan allowlist eksplisit.
 
 ## 9. Jalankan Security Agent
 
@@ -240,13 +287,18 @@ docker compose up -d --build
 docker compose ps
 docker compose logs --tail=100 llama
 docker compose logs --tail=100 agent
+docker compose logs --tail=100 caddy
 ```
 
 Health:
 
 ```bash
 curl http://127.0.0.1:8000/health
+curl -kI https://10.100.31.3/
 ```
+
+Untuk trust CA dan akses browser tanpa warning, ikuti
+`docs/WEB_UI_DEPLOYMENT_ID.md`.
 
 Index knowledge:
 
@@ -489,6 +541,18 @@ python scripts/signed_request.py \
   --case-id smoke-caldera
 ```
 
+Daftar seluruh capability BAS yang terpasang:
+
+```bash
+python scripts/signed_request.py \
+  --capability bas.list_capabilities \
+  --case-id smoke-capabilities
+```
+
+Typed capability tetap direkomendasikan. Semua binary lain yang terlihat di
+dalam bubblewrap dapat digunakan lewat `shell.execute`, tetapi selalu memerlukan
+approval, target yang dideklarasikan, engagement scope, dan egress firewall.
+
 BloodHound read-only query:
 
 ```bash
@@ -679,6 +743,13 @@ sudo find /var/lib/bas-executor/artifacts -maxdepth 3 -type f -ls
 
 Pastikan context `4096`, batch `128`, parallel `1`, dan hanya satu model yang
 berjalan. Periksa `docker stats` dan `dmesg -T | grep -i -E 'oom|killed'`.
+
+### Request investigate timeout
+
+Pada CPU-only 4 vCPU, gunakan `LLM_DISABLE_THINKING=true`,
+`LLM_PLAN_MAX_TOKENS=350`, dan `LLM_REPORT_MAX_TOKENS=650`. Request tanpa tool
+melewati planning LLM. Gunakan timeout client minimal 300 detik untuk workflow
+yang memakai tool dan menghasilkan report kedua.
 
 ### Agent gagal start
 

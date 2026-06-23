@@ -1,5 +1,6 @@
 from app.auth import approval_key_valid, validate_runtime_settings
 from app.config import Settings
+from app.web_auth import hash_password
 
 
 def test_runtime_secrets_reject_placeholders() -> None:
@@ -23,6 +24,8 @@ def test_approval_key_is_separate() -> None:
         api_key="a" * 32,
         approval_key="b" * 32,
         bas_executor_secret="c" * 32,
+        web_session_secret="d" * 32,
+        web_password_hash=hash_password("correct horse battery staple"),
     )
     validate_runtime_settings(settings)
     assert approval_key_valid("b" * 32, settings)

@@ -83,6 +83,26 @@ docker compose ps
 curl http://127.0.0.1:8000/health
 ```
 
+Web UI:
+
+```bash
+curl -kI https://10.100.31.3/
+docker compose exec agent test -f /app/web/index.html
+docker compose logs --tail=100 caddy
+```
+
+After trusting Caddy's public root CA on the operator workstation, this command
+must succeed without `-k`:
+
+```bash
+curl -I https://10.100.31.3/
+```
+
+Verify login, case creation, conversation persistence, connector status, and
+one read-only tool call. For an approval test, request a capability whose BAS
+engagement category requires approval, review the exact arguments, then reject
+it first. Confirm the rejection appears in the audit log.
+
 BAS VM:
 
 ```bash
@@ -93,4 +113,3 @@ sudo journalctl -u bas-executor -n 100 --no-pager
 
 Do not mark an integration successful based only on HTTP health. Run one
 read-only capability and inspect its artifact and audit record.
-
