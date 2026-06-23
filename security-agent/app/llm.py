@@ -10,6 +10,18 @@ class LLMClient:
     def __init__(self, settings: Settings):
         self.settings = settings
 
+    def prepare_messages(
+        self, messages: list[dict[str, str]]
+    ) -> list[dict[str, str]]:
+        prepared = [dict(message) for message in messages]
+        if self.settings.llm_disable_thinking and prepared:
+            last = prepared[-1]
+            if last.get("role") == "user" and "/no_think" not in last.get(
+                "content", ""
+            ):
+                last["content"] = f"{last.get('content', '')}\n/no_think"
+        return prepared
+
     async def chat(
         self,
         messages: list[dict[str, str]],
@@ -17,9 +29,10 @@ class LLMClient:
         temperature: float = 0.1,
         max_tokens: int = 1200,
     ) -> str:
+        prepared_messages = self.prepare_messages(messages)
         payload: dict[str, Any] = {
             "model": self.settings.llm_model,
-            "messages": messages,
+            "messages": prepared_messages,
             "temperature": temperature,
             "max_tokens": max_tokens,
         }
