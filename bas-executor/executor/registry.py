@@ -1,3 +1,4 @@
+import json
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -42,6 +43,21 @@ def certipy_find(
     ]
 
 
+def list_registered_capabilities(
+    args: dict[str, Any], secrets: dict[str, str], output: str
+) -> list[str]:
+    data = [
+        {
+            "name": item.name,
+            "category": item.category,
+            "timeout": item.timeout,
+            "adapter": item.api_action or "typed_command",
+        }
+        for item in sorted(CAPABILITIES.values(), key=lambda value: value.name)
+    ]
+    return ["/usr/bin/printf", "%s\n", json.dumps({"capabilities": data})]
+
+
 CAPABILITIES = {
     item.name: item
     for item in [
@@ -49,7 +65,7 @@ CAPABILITIES = {
             "bas.list_capabilities",
             "read_only",
             30,
-            api_action="list_capabilities",
+            command=list_registered_capabilities,
         ),
         Capability("nxc.smb_discover", "active_scan", 300, nxc("smb")),
         Capability("nxc.ldap_discover", "active_scan", 300, nxc("ldap")),
