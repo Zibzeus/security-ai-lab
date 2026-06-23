@@ -11,8 +11,8 @@ services:
       - ./policies:/app/policies:ro
       - ./skills:/app/skills:ro
       - ./connectors:/app/connectors:ro
-    mem_limit: 1g
-    cpus: 2
+    mem_limit: ${AGENT_MEMORY_LIMIT:-768m}
+    cpus: ${AGENT_CPUS:-1}
     security_opt:
       - no-new-privileges:true
     cap_drop:
@@ -32,18 +32,18 @@ services:
       - "--port"
       - "8080"
       - "-c"
-      - "${LLM_CONTEXT_SIZE:-4096}"
+      - "${LLM_CONTEXT_SIZE:-2048}"
       - "-t"
-      - "6"
+      - "${LLAMA_THREADS:-3}"
       - "-b"
-      - "${LLM_BATCH_SIZE:-128}"
+      - "${LLM_BATCH_SIZE:-64}"
       - "--parallel"
       - "1"
       - "--jinja"
     volumes:
       - ./models:/models:ro
-    mem_limit: 8g
-    cpus: 6
+    mem_limit: ${LLAMA_MEMORY_LIMIT:-5500m}
+    cpus: ${LLAMA_CPUS:-3}
     security_opt:
       - no-new-privileges:true
     cap_drop:
