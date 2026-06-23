@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-06-23 - CI secret-scan false positive
+
+- Replaced literal CALDERA test credentials with generated unit-test-only values.
+- Preserved secret scanning for tests and production code instead of excluding the
+  test directory.
+
 ## 2026-06-23
 
 - Added separate approval authentication.
