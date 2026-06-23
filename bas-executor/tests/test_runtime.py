@@ -102,7 +102,7 @@ async def test_caldera_report_retrieval_uses_official_v2_route(
     settings = Settings(
         executor_secret="x" * 32,
         caldera_url="http://caldera.local:8888",
-        caldera_api_key="caldera-key",
+        caldera_api_key="unit" * 4,
     )
     engagement = Engagement.load(ENGAGEMENT)
     result = await run_caldera(
@@ -151,7 +151,7 @@ async def test_caldera_launch_builds_current_nested_payload(
     settings = Settings(
         executor_secret="x" * 32,
         caldera_url="http://caldera.local:8888",
-        caldera_api_key="caldera-key",
+        caldera_api_key="unit" * 4,
     )
     engagement = Engagement.load(ENGAGEMENT)
     adversary = engagement.caldera_adversaries[0]
