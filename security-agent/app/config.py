@@ -12,6 +12,9 @@ class Settings(BaseSettings):
     llm_api_key: str = "local"
     llm_model: str = "local-model"
     llm_timeout_seconds: float = 120
+    llm_disable_thinking: bool = True
+    llm_plan_max_tokens: int = 350
+    llm_report_max_tokens: int = 650
     max_tool_rounds: int = 3
     api_key: str = ""
     approval_key: str = ""
