@@ -1,0 +1,5 @@
+.env
+engagements/active.yaml
+secrets/credentials.yaml
+__pycache__/
+.pytest_cache/

@@ -1,0 +1,3 @@
+name: bas-shell-execution
+description: Run an approved arbitrary shell command inside the scoped BAS sandbox.
+profiles: [redteam]

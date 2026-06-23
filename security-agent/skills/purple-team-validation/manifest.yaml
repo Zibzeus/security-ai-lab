@@ -1,0 +1,3 @@
+name: purple-team-validation
+description: Correlate approved attack emulation with ExtraHop and CrowdStrike evidence through MCP.
+profiles: [redteam, soc]

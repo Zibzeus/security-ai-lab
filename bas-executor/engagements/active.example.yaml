@@ -1,0 +1,28 @@
+engagement_id: private-lab-001
+active: true
+owner: lab-owner
+scope:
+  cidrs:
+    - 10.100.31.0/24
+    - 10.10.0.0/16
+  domains:
+    - cs.lab
+  caldera_groups:
+    - red
+  caldera_adversaries:
+    - replace-with-approved-adversary-id
+policy:
+  automatic_categories:
+    - read_only
+    - active_scan
+  approval_categories:
+    - authenticated_enumeration
+    - adversary_emulation
+    - remote_execution
+    - credential_access
+    - c2_tasking
+    - phishing
+  denied_categories:
+    - destructive
+    - denial_of_service
+    - log_deletion

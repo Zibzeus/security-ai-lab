@@ -1,0 +1,23 @@
+[Unit]
+Description=Controlled BAS Executor
+After=network-online.target
+
+[Service]
+Type=simple
+User=bas-agent
+Group=bas-agent
+WorkingDirectory=/opt/bas-executor
+EnvironmentFile=/opt/bas-executor/.env
+ExecStart=/opt/bas-executor/.venv/bin/uvicorn executor.main:app --host ${EXECUTOR_BIND_HOST} --port ${EXECUTOR_PORT}
+Restart=on-failure
+NoNewPrivileges=true
+PrivateTmp=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/var/lib/bas-executor
+RestrictSUIDSGID=true
+LockPersonality=true
+RestrictRealtime=true
+
+[Install]
+WantedBy=multi-user.target

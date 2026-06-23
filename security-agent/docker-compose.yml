@@ -1,0 +1,53 @@
+services:
+  agent:
+    build: .
+    restart: unless-stopped
+    env_file: .env
+    ports:
+      - "127.0.0.1:8000:8000"
+    volumes:
+      - agent-data:/data
+      - ./knowledge:/app/knowledge:ro
+      - ./policies:/app/policies:ro
+      - ./skills:/app/skills:ro
+      - ./connectors:/app/connectors:ro
+    mem_limit: 1g
+    cpus: 2
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    depends_on:
+      llama:
+        condition: service_started
+
+  llama:
+    image: ${LLAMA_IMAGE:-ghcr.io/ggml-org/llama.cpp:server}
+    restart: unless-stopped
+    command:
+      - "-m"
+      - "/models/Qwen3-4B-Q4_K_M.gguf"
+      - "--host"
+      - "0.0.0.0"
+      - "--port"
+      - "8080"
+      - "-c"
+      - "${LLM_CONTEXT_SIZE:-4096}"
+      - "-t"
+      - "6"
+      - "-b"
+      - "${LLM_BATCH_SIZE:-128}"
+      - "--parallel"
+      - "1"
+      - "--jinja"
+    volumes:
+      - ./models:/models:ro
+    mem_limit: 8g
+    cpus: 6
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  agent-data:

@@ -1,0 +1,9 @@
+from executor.registry import CAPABILITIES
+
+
+def test_registered_capability_categories() -> None:
+    assert CAPABILITIES["shell.execute"].category == "remote_execution"
+    assert CAPABILITIES["nxc.smb_discover"].category == "active_scan"
+    assert CAPABILITIES["caldera.launch_operation"].category == "adversary_emulation"
+    assert CAPABILITIES["caldera.get_operation_report"].category == "read_only"
+    assert CAPABILITIES["bloodhound.cypher_query"].category == "read_only"

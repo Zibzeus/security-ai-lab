@@ -1,0 +1,3 @@
+name: caldera-operations
+description: Plan, launch, monitor, and report authorized MITRE CALDERA operations.
+profiles: [redteam, soc]

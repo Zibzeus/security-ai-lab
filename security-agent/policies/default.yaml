@@ -1,0 +1,26 @@
+defaults:
+  read: allow
+  active: approval
+  simulate: dry_run
+  write: approval
+  destructive: deny
+
+profiles:
+  soc:
+    read: allow
+    active: allow
+    simulate: dry_run
+    write: approval
+    destructive: deny
+  redteam:
+    read: allow
+    active: allow
+    simulate: dry_run
+    write: approval
+    destructive: deny
+  grc:
+    read: allow
+    active: deny
+    simulate: deny
+    write: deny
+    destructive: deny
