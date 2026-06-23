@@ -1,0 +1,15 @@
+**/.env
+**/.venv/
+**/.venv*/
+.model-download-venv/
+**/__pycache__/
+**/.pytest_cache/
+**/*.pyc
+**/*.egg-info/
+**/*.db
+**/*.gguf
+**/*.gguf.sha256
+**/artifacts/
+**/engagements/active.yaml
+**/secrets/credentials.yaml
+.DS_Store
