@@ -105,7 +105,8 @@ class BASExecute(Tool):
 class MCPQuery(Tool):
     name = "mcp_query"
     description = (
-        "Call an allowlisted read-only tool from the ExtraHop or CrowdStrike MCP server."
+        "Call a tool exposed by a configured MCP server. Server-side credentials and "
+        "the local wildcard/allowlist configuration still apply."
     )
     risk = Risk.READ
 
@@ -135,6 +136,16 @@ class MCPQuery(Tool):
         )
 
 
+class MCPListTools(Tool):
+    name = "mcp_list_tools"
+    description = "Discover tools exposed by one configured MCP server."
+    risk = Risk.READ
+
+    async def run(self, arguments: dict[str, Any], dry_run: bool) -> dict[str, Any]:
+        bridge = MCPBridge(get_settings().mcp_config_file)
+        return await bridge.list_tools(str(arguments["server"]))
+
+
 TOOLS: dict[str, Tool] = {
     tool.name: tool
     for tool in [
@@ -142,6 +153,7 @@ TOOLS: dict[str, Tool] = {
         SimulateSecurityTest(),
         IsolateAsset(),
         BASExecute(),
+        MCPListTools(),
         MCPQuery(),
     ]
 }
