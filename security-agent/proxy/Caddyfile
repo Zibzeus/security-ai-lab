@@ -1,0 +1,24 @@
+{
+	default_sni 10.100.31.3
+}
+
+http://10.100.31.3 {
+	redir https://10.100.31.3{uri} permanent
+}
+
+https://10.100.31.3 {
+	tls internal
+	encode gzip
+
+	reverse_proxy agent:8000
+
+	header {
+		Strict-Transport-Security "max-age=31536000"
+		-Server
+	}
+
+	log {
+		output stdout
+		format console
+	}
+}

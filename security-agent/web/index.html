@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="color-scheme" content="dark">
+    <title>Security AI Lab</title>
+    <link rel="stylesheet" href="/assets/app.css">
+  </head>
+  <body>
+    <div id="login-view" class="login-shell">
+      <form id="login-form" class="login-card">
+        <div class="brand-mark">SA</div>
+        <p class="eyebrow">INTERNAL SECURITY OPERATIONS</p>
+        <h1>Security AI Lab</h1>
+        <p class="muted">Authenticated access to SOC, Red Team, and GRC workflows.</p>
+        <label>
+          Username
+          <input id="login-username" autocomplete="username" required>
+        </label>
+        <label>
+          Password
+          <input id="login-password" type="password" autocomplete="current-password" required>
+        </label>
+        <button type="submit" class="primary">Sign in</button>
+        <p id="login-error" class="error" role="alert"></p>
+      </form>
+    </div>
+
+    <div id="app-view" class="app-shell hidden">
+      <aside class="sidebar">
+        <div class="sidebar-brand">
+          <div class="brand-mark small">SA</div>
+          <div>
+            <strong>Security AI Lab</strong>
+            <span>Internal operations</span>
+          </div>
+        </div>
+
+        <button id="new-case-toggle" class="primary full">+ New case</button>
+        <form id="new-case-form" class="new-case hidden">
+          <input id="new-case-title" maxlength="160" placeholder="Case title" required>
+          <select id="new-case-profile">
+            <option value="soc">SOC</option>
+            <option value="redteam">Red Team</option>
+            <option value="grc">GRC</option>
+          </select>
+          <div class="row">
+            <button type="submit" class="primary">Create</button>
+            <button id="new-case-cancel" type="button" class="ghost">Cancel</button>
+          </div>
+        </form>
+
+        <div class="sidebar-section-title">Cases</div>
+        <div id="case-list" class="case-list"></div>
+
+        <div class="sidebar-footer">
+          <span id="current-user"></span>
+          <button id="logout-button" class="ghost compact">Sign out</button>
+        </div>
+      </aside>
+
+      <main class="workspace">
+        <header class="topbar">
+          <div>
+            <p class="eyebrow">CASE WORKSPACE</p>
+            <h2 id="case-title">Select or create a case</h2>
+            <div id="case-meta" class="case-meta"></div>
+          </div>
+          <nav class="view-tabs" aria-label="Workspace view">
+            <button class="tab active" data-view="chat">Chat</button>
+            <button class="tab" data-view="audit">Audit log</button>
+          </nav>
+        </header>
+
+        <section id="service-status" class="status-strip"></section>
+
+        <section id="chat-view" class="view-panel">
+          <div id="empty-state" class="empty-state">
+            <div class="empty-icon">⌁</div>
+            <h3>No case selected</h3>
+            <p>Create a SOC, Red Team, or GRC case to begin.</p>
+          </div>
+
+          <div id="case-workspace" class="case-workspace hidden">
+            <div id="message-list" class="messages"></div>
+            <section id="approval-panel" class="approval-panel hidden">
+              <div class="panel-heading">
+                <div>
+                  <p class="eyebrow warning">HUMAN APPROVAL REQUIRED</p>
+                  <h3>Pending actions</h3>
+                </div>
+              </div>
+              <div id="approval-list"></div>
+            </section>
+
+            <form id="chat-form" class="composer">
+              <textarea id="chat-message" maxlength="4000" rows="3"
+                placeholder="Ask the agent to investigate, validate, or assess…" required></textarea>
+              <details class="evidence-box">
+                <summary>Add evidence</summary>
+                <textarea id="chat-evidence" rows="3"
+                  placeholder="One evidence item per line"></textarea>
+              </details>
+              <div class="composer-actions">
+                <label class="toggle">
+                  <input id="allow-tools" type="checkbox" checked>
+                  <span>Allow policy-controlled tools</span>
+                </label>
+                <button id="send-button" type="submit" class="primary">Send</button>
+              </div>
+            </form>
+          </div>
+        </section>
+
+        <section id="audit-view" class="view-panel hidden">
+          <div class="audit-toolbar">
+            <p>Security decisions and execution events are stored in SQLite.</p>
+            <button id="refresh-audit" class="ghost">Refresh</button>
+          </div>
+          <div id="audit-list" class="audit-list"></div>
+        </section>
+      </main>
+    </div>
+
+    <dialog id="approval-dialog" class="approval-dialog">
+      <form id="approval-form">
+        <p class="eyebrow warning">SEPARATE APPROVAL CREDENTIAL</p>
+        <h3>Approve exact pending action</h3>
+        <p class="muted">
+          Enter the independent approval key. It is sent only for this action
+          and is not stored in the browser or case database.
+        </p>
+        <label>
+          Approval key
+          <input id="approval-key" type="password" autocomplete="off" required>
+        </label>
+        <div class="dialog-actions">
+          <button id="approval-cancel" type="button" class="ghost">Cancel</button>
+          <button type="submit" class="primary">Approve and execute</button>
+        </div>
+      </form>
+    </dialog>
+
+    <div id="toast" class="toast hidden" role="status"></div>
+    <script src="/assets/app.js" defer></script>
+  </body>
+</html>

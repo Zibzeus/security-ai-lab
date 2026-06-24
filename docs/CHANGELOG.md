@@ -1,5 +1,41 @@
 # Changelog
 
+## 2026-06-23 - PDF RAG ingestion
+
+- Added recursive PDF, Markdown, and text ingestion from configured knowledge
+  directories.
+- Added page-aware PDF chunking and citations.
+- Added configurable document size, document count, chunk size, and overlap
+  limits.
+- Added a Git-ignored read-only `rag-sources` mount.
+- Added provenance and licensing guidance for production RAG sources.
+- Explicitly excluded the unlicensed `bugbountybooks` corpus from Git and
+  production ingestion.
+
+## 2026-06-23 - Web operations console
+
+- Added a lightweight, dependency-free Web UI served by FastAPI.
+- Added authenticated SOC, Red Team, and GRC case workspaces.
+- Added persistent case messages, evidence, tool results, approvals, and audit
+  history in SQLite.
+- Added bounded conversation memory: full history is retained, while only a
+  configurable recent window is sent to the model.
+- Added exact-action approval and rejection from the Web UI without weakening
+  BAS engagement scope or category enforcement.
+- Added live LLM, BAS, ExtraHop MCP, and CrowdStrike MCP health cards.
+- Added Caddy HTTPS reverse proxy with an internal CA for direct LAN access.
+- Added Web UI password-hash verification tooling and safer `.env` guidance for
+  single-quoting scrypt hashes containing `$`.
+- Added per-stage Qwen thinking controls so JSON planning can stay no-think
+  while final reports can use thinking mode with longer timeouts.
+- Disabled Swagger/OpenAPI by default in production.
+
+## 2026-06-23 - CPU inference latency
+
+- Disabled Qwen3 thinking mode for agent JSON planning and reporting.
+- Reduced configurable planning/report token budgets for the 4-vCPU profile.
+- Skipped the planning inference entirely when `allow_tools` is false.
+
 ## 2026-06-23 - Security Agent container build
 
 - Copied the Python `app` package before running `pip install .` in the image.

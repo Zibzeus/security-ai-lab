@@ -3,6 +3,7 @@ import secrets
 from fastapi import Header, HTTPException
 
 from app.config import Settings, get_settings
+from app.web_auth import normalize_password_hash
 
 
 PLACEHOLDER_PREFIXES = ("change-me", "replace-", "development-")
@@ -17,11 +18,18 @@ def validate_runtime_settings(settings: Settings) -> None:
         "API_KEY": settings.api_key,
         "APPROVAL_KEY": settings.approval_key,
         "BAS_EXECUTOR_SECRET": settings.bas_executor_secret,
+        "WEB_SESSION_SECRET": settings.web_session_secret,
     }
     invalid = [name for name, value in required.items() if not _strong_secret(value)]
     if invalid:
         raise ValueError(
             f"Set non-placeholder 32+ character secrets for: {', '.join(invalid)}"
+        )
+    if not settings.web_username.strip():
+        raise ValueError("WEB_USERNAME must not be empty")
+    if not normalize_password_hash(settings.web_password_hash).startswith("scrypt$"):
+        raise ValueError(
+            "Set WEB_PASSWORD_HASH using scripts/hash_web_password.py"
         )
 
 

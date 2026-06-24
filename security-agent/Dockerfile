@@ -12,6 +12,8 @@ COPY knowledge knowledge
 COPY skills skills
 COPY connectors connectors
 COPY docs docs
+COPY web web
+COPY scripts scripts
 
 RUN useradd --create-home --uid 10001 agent \
     && mkdir -p /data \

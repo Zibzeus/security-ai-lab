@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     llm_model: str = "local-model"
     llm_timeout_seconds: float = 120
     llm_disable_thinking: bool = True
+    llm_plan_disable_thinking: bool = True
+    llm_report_disable_thinking: bool = True
     llm_plan_max_tokens: int = 350
     llm_report_max_tokens: int = 650
     max_tool_rounds: int = 3
@@ -24,6 +26,19 @@ class Settings(BaseSettings):
     mcp_config_file: Path = Path("/app/connectors/mcp.yaml")
     skill_dir: Path = Path("/app/skills")
     knowledge_dirs: str = "/app/knowledge,/app/docs"
+    rag_chunk_chars: int = 1_800
+    rag_overlap_chars: int = 200
+    rag_max_documents: int = 500
+    rag_max_file_bytes: int = 25 * 1024 * 1024
+    web_dir: Path = Path("/app/web")
+    web_username: str = "admin"
+    web_password_hash: str = ""
+    web_session_secret: str = ""
+    web_session_ttl_seconds: int = 28_800
+    web_memory_turns: int = 8
+    web_memory_chars_per_turn: int = 1_200
+    web_secure_cookie: bool = True
+    enable_api_docs: bool = False
     model_config = SettingsConfigDict(env_file=".env", extra="ignore")
 
 
