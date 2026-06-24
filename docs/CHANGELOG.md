@@ -26,6 +26,8 @@
 - Added Caddy HTTPS reverse proxy with an internal CA for direct LAN access.
 - Added Web UI password-hash verification tooling and safer `.env` guidance for
   single-quoting scrypt hashes containing `$`.
+- Added per-stage Qwen thinking controls so JSON planning can stay no-think
+  while final reports can use thinking mode with longer timeouts.
 - Disabled Swagger/OpenAPI by default in production.
 
 ## 2026-06-23 - CPU inference latency

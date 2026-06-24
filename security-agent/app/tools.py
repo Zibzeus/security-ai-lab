@@ -111,6 +111,12 @@ class MCPQuery(Tool):
     risk = Risk.READ
 
     async def run(self, arguments: dict[str, Any], dry_run: bool) -> dict[str, Any]:
+        if not arguments.get("server"):
+            raise ValueError(
+                "mcp_query requires arguments.server, for example 'extrahop' or 'crowdstrike'"
+            )
+        if not arguments.get("tool"):
+            raise ValueError("mcp_query requires arguments.tool with an exact MCP tool name")
         settings = get_settings()
         networks = [
             ipaddress.ip_network(item.strip())
@@ -142,6 +148,10 @@ class MCPListTools(Tool):
     risk = Risk.READ
 
     async def run(self, arguments: dict[str, Any], dry_run: bool) -> dict[str, Any]:
+        if not arguments.get("server"):
+            raise ValueError(
+                "mcp_list_tools requires arguments.server, for example 'extrahop' or 'crowdstrike'"
+            )
         bridge = MCPBridge(get_settings().mcp_config_file)
         return await bridge.list_tools(str(arguments["server"]))
 
@@ -159,8 +169,50 @@ TOOLS: dict[str, Tool] = {
 }
 
 
-def tool_catalog() -> list[dict[str, str]]:
+TOOL_ARGUMENT_SCHEMAS: dict[str, dict[str, Any]] = {
+    "inspect_target": {
+        "required": ["target"],
+        "example": {"target": "10.100.31.10"},
+    },
+    "simulate_security_test": {
+        "required": ["target", "technique"],
+        "example": {"target": "10.100.31.10", "technique": "T1046"},
+    },
+    "isolate_asset": {
+        "required": ["target"],
+        "example": {"target": "10.100.31.10"},
+    },
+    "bas_execute": {
+        "required": ["capability", "arguments"],
+        "example": {
+            "capability": "nxc.smb_discover",
+            "arguments": {"targets": ["10.100.31.0/24"]},
+        },
+    },
+    "mcp_list_tools": {
+        "required": ["server"],
+        "allowed_servers": ["extrahop", "crowdstrike"],
+        "example": {"server": "extrahop"},
+    },
+    "mcp_query": {
+        "required": ["server", "tool", "arguments"],
+        "allowed_servers": ["extrahop", "crowdstrike"],
+        "example": {
+            "server": "extrahop",
+            "tool": "exact_tool_name_from_mcp_list_tools",
+            "arguments": {"ip": "10.100.31.10"},
+        },
+    },
+}
+
+
+def tool_catalog() -> list[dict[str, Any]]:
     return [
-        {"name": tool.name, "description": tool.description, "risk": tool.risk.value}
+        {
+            "name": tool.name,
+            "description": tool.description,
+            "risk": tool.risk.value,
+            "argument_schema": TOOL_ARGUMENT_SCHEMAS.get(tool.name, {}),
+        }
         for tool in TOOLS.values()
     ]

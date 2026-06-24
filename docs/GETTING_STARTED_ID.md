@@ -199,11 +199,14 @@ WEB_USERNAME=admin
 
 LLM_BASE_URL=http://llama:8080/v1
 LLM_MODEL=local-model
-LLM_CONTEXT_SIZE=2048
+LLM_CONTEXT_SIZE=4096
 LLM_BATCH_SIZE=64
 LLM_DISABLE_THINKING=true
-LLM_PLAN_MAX_TOKENS=350
-LLM_REPORT_MAX_TOKENS=650
+LLM_PLAN_DISABLE_THINKING=true
+LLM_REPORT_DISABLE_THINKING=false
+LLM_PLAN_MAX_TOKENS=700
+LLM_REPORT_MAX_TOKENS=1400
+MAX_TOOL_ROUNDS=3
 LLAMA_THREADS=3
 LLAMA_MEMORY_LIMIT=5500m
 LLAMA_CPUS=3
@@ -760,9 +763,10 @@ berjalan. Periksa `docker stats` dan `dmesg -T | grep -i -E 'oom|killed'`.
 ### Request investigate timeout
 
 Pada CPU-only 4 vCPU, gunakan `LLM_DISABLE_THINKING=true`,
-`LLM_PLAN_MAX_TOKENS=350`, dan `LLM_REPORT_MAX_TOKENS=650`. Request tanpa tool
-melewati planning LLM. Gunakan timeout client minimal 300 detik untuk workflow
-yang memakai tool dan menghasilkan report kedua.
+`LLM_PLAN_DISABLE_THINKING=true`, `LLM_REPORT_DISABLE_THINKING=false`,
+`LLM_PLAN_MAX_TOKENS=700`, dan `LLM_REPORT_MAX_TOKENS=1400`. Request tanpa tool
+melewati planning LLM. Gunakan timeout client minimal 900 detik untuk workflow
+yang memakai MCP/BAS dan menghasilkan report dengan thinking mode.
 
 ### Agent gagal start
 
