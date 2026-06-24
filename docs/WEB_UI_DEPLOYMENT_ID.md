@@ -100,13 +100,43 @@ Tambahkan:
 
 ```dotenv
 WEB_USERNAME=admin
-WEB_PASSWORD_HASH='scrypt$...'
+WEB_PASSWORD_HASH=scrypt$...
 WEB_SESSION_SECRET=PASTE_RANDOM_64_HEX
 WEB_SESSION_TTL_SECONDS=28800
 WEB_MEMORY_TURNS=8
 WEB_MEMORY_CHARS_PER_TURN=1200
 WEB_SECURE_COOKIE=true
 ENABLE_API_DOCS=false
+```
+
+Jika update `.env` dari shell, jangan pakai `echo "WEB_PASSWORD_HASH=scrypt$..."`
+karena `$...` dapat diproses sebagai variable shell. Pakai editor, atau pakai
+single-quoted heredoc:
+
+```bash
+python3 - <<'PY'
+from pathlib import Path
+
+env = Path(".env")
+lines = env.read_text(encoding="utf-8").splitlines()
+updates = {
+    "WEB_USERNAME": "admin",
+    "WEB_PASSWORD_HASH": "PASTE_SCRYPT_HASH_HERE",
+}
+seen = set()
+out = []
+for line in lines:
+    key = line.split("=", 1)[0] if "=" in line else ""
+    if key in updates:
+        out.append(f"{key}={updates[key]}")
+        seen.add(key)
+    else:
+        out.append(line)
+for key, value in updates.items():
+    if key not in seen:
+        out.append(f"{key}={value}")
+env.write_text("\n".join(out) + "\n", encoding="utf-8")
+PY
 ```
 
 Jangan menggunakan `APPROVAL_KEY`, `API_KEY`, atau `BAS_EXECUTOR_SECRET` sebagai
@@ -120,6 +150,21 @@ awk -F= '
 /^WEB_PASSWORD_HASH=/{print "password_hash_configured=" (length($2)>20)}
 /^WEB_SESSION_SECRET=/{print "session_secret_length=" length($2)}
 ' .env
+```
+
+Verifikasi password tanpa menampilkan password/hash:
+
+```bash
+docker compose run --rm --no-deps \
+  --entrypoint python agent \
+  /app/scripts/verify_web_password.py
+```
+
+Output yang benar:
+
+```text
+password_hash_configured=True
+password_ok=True
 ```
 
 ## 5. Periksa MCP dan CA

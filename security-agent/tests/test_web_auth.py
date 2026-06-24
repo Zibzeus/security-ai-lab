@@ -2,6 +2,7 @@ from app.config import Settings
 from app.web_auth import (
     create_session_token,
     hash_password,
+    normalize_password_hash,
     parse_session_token,
     verify_password,
 )
@@ -14,7 +15,9 @@ def test_password_hash_round_trip() -> None:
     )
     assert verify_password("correct horse battery staple", encoded)
     assert not verify_password("incorrect password", encoded)
+    assert verify_password("correct horse battery staple", f" '{encoded}' \n")
     assert "correct horse" not in encoded
+    assert normalize_password_hash(f" '{encoded}' \n") == encoded
 
 
 def test_signed_session_round_trip() -> None:

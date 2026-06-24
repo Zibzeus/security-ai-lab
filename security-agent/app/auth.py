@@ -3,6 +3,7 @@ import secrets
 from fastapi import Header, HTTPException
 
 from app.config import Settings, get_settings
+from app.web_auth import normalize_password_hash
 
 
 PLACEHOLDER_PREFIXES = ("change-me", "replace-", "development-")
@@ -26,7 +27,7 @@ def validate_runtime_settings(settings: Settings) -> None:
         )
     if not settings.web_username.strip():
         raise ValueError("WEB_USERNAME must not be empty")
-    if not settings.web_password_hash.startswith("scrypt$"):
+    if not normalize_password_hash(settings.web_password_hash).startswith("scrypt$"):
         raise ValueError(
             "Set WEB_PASSWORD_HASH using scripts/hash_web_password.py"
         )

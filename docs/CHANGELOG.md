@@ -24,6 +24,8 @@
   BAS engagement scope or category enforcement.
 - Added live LLM, BAS, ExtraHop MCP, and CrowdStrike MCP health cards.
 - Added Caddy HTTPS reverse proxy with an internal CA for direct LAN access.
+- Added Web UI password-hash verification tooling and safer `.env` guidance for
+  scrypt hashes containing `$`.
 - Disabled Swagger/OpenAPI by default in production.
 
 ## 2026-06-23 - CPU inference latency

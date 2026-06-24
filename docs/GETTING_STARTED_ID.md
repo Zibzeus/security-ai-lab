@@ -226,15 +226,27 @@ docker compose run --rm --no-deps \
 Tambahkan output `scrypt$...` ke `.env`:
 
 ```dotenv
-WEB_PASSWORD_HASH='scrypt$...'
+WEB_PASSWORD_HASH=scrypt$...
 WEB_SECURE_COOKIE=true
 ENABLE_API_DOCS=false
 ```
+
+Jika menulis nilai ini via shell, pakai single-quoted heredoc atau editor.
+Jangan `echo "WEB_PASSWORD_HASH=scrypt$..."` karena `$` dapat di-expand oleh
+shell sebelum masuk `.env`.
 
 Gunakan permission ketat:
 
 ```bash
 chmod 600 .env
+```
+
+Tes hash login sebelum membuka browser:
+
+```bash
+docker compose run --rm --no-deps \
+  --entrypoint python agent \
+  /app/scripts/verify_web_password.py
 ```
 
 `APPROVAL_KEY` hanya diberikan kepada approver/operator yang berwenang. Password

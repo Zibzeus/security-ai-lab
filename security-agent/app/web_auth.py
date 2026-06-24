@@ -26,6 +26,10 @@ def _b64_decode(value: str) -> bytes:
     return base64.urlsafe_b64decode(value + padding)
 
 
+def normalize_password_hash(encoded: str) -> str:
+    return encoded.strip().strip("'\"")
+
+
 def hash_password(password: str, salt: bytes | None = None) -> str:
     if len(password) < 12:
         raise ValueError("Password must contain at least 12 characters")
@@ -53,7 +57,9 @@ def hash_password(password: str, salt: bytes | None = None) -> str:
 
 def verify_password(password: str, encoded: str) -> bool:
     try:
-        algorithm, n, r, p, salt, expected = encoded.split("$", 5)
+        algorithm, n, r, p, salt, expected = normalize_password_hash(encoded).split(
+            "$", 5
+        )
         if algorithm != "scrypt":
             return False
         actual = hashlib.scrypt(
