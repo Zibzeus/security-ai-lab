@@ -226,14 +226,15 @@ docker compose run --rm --no-deps \
 Tambahkan output `scrypt$...` ke `.env`:
 
 ```dotenv
-WEB_PASSWORD_HASH=scrypt$...
+WEB_PASSWORD_HASH='scrypt$...'
 WEB_SECURE_COOKIE=true
 ENABLE_API_DOCS=false
 ```
 
-Jika menulis nilai ini via shell, pakai single-quoted heredoc atau editor.
-Jangan `echo "WEB_PASSWORD_HASH=scrypt$..."` karena `$` dapat di-expand oleh
-shell sebelum masuk `.env`.
+Wajib pakai single quote untuk `WEB_PASSWORD_HASH`. Hash scrypt berisi banyak
+karakter `$`; tanpa single quote Docker Compose dapat menganggap sebagian hash
+sebagai variable dan nilai yang masuk ke container menjadi rusak. Jangan
+`echo "WEB_PASSWORD_HASH=scrypt$..."`.
 
 Gunakan permission ketat:
 

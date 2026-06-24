@@ -100,7 +100,7 @@ Tambahkan:
 
 ```dotenv
 WEB_USERNAME=admin
-WEB_PASSWORD_HASH=scrypt$...
+WEB_PASSWORD_HASH='scrypt$...'
 WEB_SESSION_SECRET=PASTE_RANDOM_64_HEX
 WEB_SESSION_TTL_SECONDS=28800
 WEB_MEMORY_TURNS=8
@@ -119,9 +119,10 @@ from pathlib import Path
 
 env = Path(".env")
 lines = env.read_text(encoding="utf-8").splitlines()
+password_hash = "PASTE_SCRYPT_HASH_HERE".strip().strip("'\"")
 updates = {
     "WEB_USERNAME": "admin",
-    "WEB_PASSWORD_HASH": "PASTE_SCRYPT_HASH_HERE",
+    "WEB_PASSWORD_HASH": f"'{password_hash}'",
 }
 seen = set()
 out = []
