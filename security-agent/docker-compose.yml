@@ -11,6 +11,8 @@ services:
       - ./policies:/app/policies:ro
       - ./skills:/app/skills:ro
       - ./connectors:/app/connectors:ro
+      - ./local-certs:/app/local-certs:ro
+      - ./rag-sources:/app/rag-sources:ro
     mem_limit: ${AGENT_MEMORY_LIMIT:-768m}
     cpus: ${AGENT_CPUS:-1}
     security_opt:
@@ -20,6 +22,27 @@ services:
     depends_on:
       llama:
         condition: service_started
+
+  caddy:
+    image: caddy:2.8.4-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./proxy/Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+      - caddy-config:/config
+    mem_limit: 128m
+    cpus: 0.25
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE
+    depends_on:
+      - agent
 
   llama:
     image: ${LLAMA_IMAGE:-ghcr.io/ggml-org/llama.cpp:server}
@@ -51,3 +74,5 @@ services:
 
 volumes:
   agent-data:
+  caddy-data:
+  caddy-config:

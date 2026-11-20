@@ -1,4 +1,5 @@
 import json
+import re
 from typing import Any
 
 import httpx
@@ -11,10 +12,18 @@ class LLMClient:
         self.settings = settings
 
     def prepare_messages(
-        self, messages: list[dict[str, str]]
+        self,
+        messages: list[dict[str, str]],
+        *,
+        disable_thinking: bool | None = None,
     ) -> list[dict[str, str]]:
         prepared = [dict(message) for message in messages]
-        if self.settings.llm_disable_thinking and prepared:
+        no_think = (
+            self.settings.llm_disable_thinking
+            if disable_thinking is None
+            else disable_thinking
+        )
+        if no_think and prepared:
             last = prepared[-1]
             if last.get("role") == "user" and "/no_think" not in last.get(
                 "content", ""
@@ -28,8 +37,12 @@ class LLMClient:
         *,
         temperature: float = 0.1,
         max_tokens: int = 1200,
+        disable_thinking: bool | None = None,
+        strip_thinking: bool = True,
     ) -> str:
-        prepared_messages = self.prepare_messages(messages)
+        prepared_messages = self.prepare_messages(
+            messages, disable_thinking=disable_thinking
+        )
         payload: dict[str, Any] = {
             "model": self.settings.llm_model,
             "messages": prepared_messages,
@@ -46,11 +59,24 @@ class LLMClient:
                 json=payload,
             )
             response.raise_for_status()
-            return response.json()["choices"][0]["message"]["content"]
+            content = response.json()["choices"][0]["message"]["content"]
+            return self.strip_thinking(content) if strip_thinking else content
+
+    @staticmethod
+    def strip_thinking(content: str) -> str:
+        value = re.sub(
+            r"<think>.*?</think>",
+            "",
+            content,
+            flags=re.IGNORECASE | re.DOTALL,
+        ).strip()
+        return value or content.strip()
 
     @staticmethod
     def parse_json(content: str) -> dict[str, Any]:
-        value = content.strip()
+        value = LLMClient.strip_thinking(content)
         if value.startswith("```"):
             value = value.split("\n", 1)[1].rsplit("```", 1)[0]
+        if not value.lstrip().startswith("{") and "{" in value and "}" in value:
+            value = value[value.find("{") : value.rfind("}") + 1]
         return json.loads(value)

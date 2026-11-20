@@ -1,11 +1,10 @@
 servers:
   extrahop:
-    url: http://extrahop-mcp:8322/mcp
-    bearer_token_env: EXTRAHOP_MCP_TOKEN
+    url: https://10.100.31.4:8325/mcp
+    ca_cert: /app/local-certs/extrahop-mcp.crt
     allowed_tools:
       - "*"
   crowdstrike:
-    url: http://crowdstrike-mcp:8080/mcp
-    bearer_token_env: CROWDSTRIKE_MCP_TOKEN
+    url: http://10.100.31.4:8000/mcp
     allowed_tools:
       - "*"

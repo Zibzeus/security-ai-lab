@@ -35,11 +35,33 @@ before use.
 cd security-agent
 cp .env.example .env
 openssl rand -hex 32
-# Generate three independent values for API_KEY, APPROVAL_KEY, and
-# BAS_EXECUTOR_SECRET.
-docker compose up -d --build
+# Generate four independent values for API_KEY, APPROVAL_KEY,
+# BAS_EXECUTOR_SECRET, and WEB_SESSION_SECRET.
+docker compose build agent
+docker compose run --rm --no-deps \
+  --entrypoint python agent \
+  /app/scripts/hash_web_password.py
+# Put the resulting scrypt hash in WEB_PASSWORD_HASH using single quotes, then:
+docker compose up -d
 curl http://127.0.0.1:8000/health
 ```
+
+## Web operations console
+
+The lightweight Web UI provides authenticated SOC, Red Team, and GRC cases,
+persistent conversation history, evidence, tool results, exact-action approval,
+connector status, and audit history.
+
+It is exposed through Caddy at:
+
+```text
+https://10.100.31.3/
+```
+
+The Agent API remains bound to localhost. Configure `WEB_USERNAME`,
+`WEB_PASSWORD_HASH`, and `WEB_SESSION_SECRET` before startup. See
+`../docs/WEB_UI_DEPLOYMENT_ID.md` for the complete deployment and CA trust
+procedure.
 
 Index approved knowledge:
 
@@ -47,6 +69,11 @@ Index approved knowledge:
 curl -X POST http://127.0.0.1:8000/v1/knowledge/reindex \
   -H "X-API-Key: YOUR_KEY"
 ```
+
+The reindex endpoint supports `.md`, `.txt`, and `.pdf`. PDF citations include
+page and chunk numbers. Place runtime-only documents in `rag-sources/`; that
+directory is mounted read-only and ignored by Git. See
+`../docs/RAG_SOURCES_ID.md`.
 
 Run a SOC investigation:
 

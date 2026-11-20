@@ -16,6 +16,10 @@ The project uses two separate trust zones:
 | `bas-executor` | BAS VM | Scoped execution of registered capabilities |
 
 Start with [docs/GETTING_STARTED_ID.md](docs/GETTING_STARTED_ID.md).
+Deploy the authenticated HTTPS console with
+[docs/WEB_UI_DEPLOYMENT_ID.md](docs/WEB_UI_DEPLOYMENT_ID.md).
+Manage production knowledge sources with
+[docs/RAG_SOURCES_ID.md](docs/RAG_SOURCES_ID.md).
 
 ## Implemented integrations
 

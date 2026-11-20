@@ -16,7 +16,7 @@ MATCHES="$(
 )"
 FILTERED="$(
   printf '%s\n' "${MATCHES}" |
-    grep -Eiv 'YOUR_KEY|replace-me|change-me|example|placeholder' || true
+    grep -Eiv 'YOUR_KEY|replace-me|change-me|example|placeholder|getpass\(' || true
 )"
 
 if [[ -n "${FILTERED}" ]]; then

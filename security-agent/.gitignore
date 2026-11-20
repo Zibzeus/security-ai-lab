@@ -4,3 +4,7 @@ __pycache__/
 *.pyc
 *.db
 models/*.gguf
+local-certs/*
+!local-certs/.gitkeep
+rag-sources/*
+!rag-sources/.gitkeep
